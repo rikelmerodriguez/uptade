@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agendamento - Gilmar Motos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom styles */
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .calendar-icon::after {
+            content: '\f073';
+            font-family: 'Font Awesome 6 Free';
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            color: #6b7280;
+        }
+        
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="min-h-screen">
+        <!-- Header -->
+        <header class="bg-blue-800 text-white shadow-lg">
+            <div class="container mx-auto px-4 py-6">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="flex items-center mb-4 md:mb-0">
+                        <i class="fas fa-motorcycle text-3xl mr-3"></i>
+                        <h1 class="text-2xl font-bold">Gilmar Motos</h1>
+                    </div>
+                    <nav class="flex space-x-6">
+                        <button id="scheduleTab" class="font-medium px-3 py-2 rounded-lg bg-blue-700 hover:bg-blue-600 transition">Novo Agendamento</button>
+                        <button id="viewTab" class="font-medium px-3 py-2 rounded-lg hover:bg-blue-700 transition">Visualizar Agendamentos</button>
+                    </nav>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="container mx-auto px-4 py-8">
+            <!-- Schedule Form Section -->
+            <section id="scheduleSection" class="fade-in">
+                <div class="bg-white rounded-xl shadow-md overflow-hidden p-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Agendar Serviço</h2>
+                    
+                    <form id="scheduleForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Customer Info -->
+                        <div class="space-y-4">
+                            <h3 class="text-lg font-semibold text-gray-700 border-b pb-2">Dados do Cliente</h3>
+                            
+                            <div>
+                                <label for="customerName" class="block text-sm font-medium text-gray-700 mb-1">Nome Completo*</label>
+                                <input type="text" id="customerName" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            
+                            <div>
+                                <label for="customerPhone" class="block text-sm font-medium text-gray-700 mb-1">Telefone*</label>
+                                <input type="tel" id="customerPhone" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="(00) 00000-0000">
+                            </div>
+                            
+                            <div>
+                                <label for="bikeModel" class="block text-sm font-medium text-gray-700 mb-1">Modelo da Moto*</label>
+                                <input type="text" id="bikeModel" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                        </div>
+                        
+                        <!-- Service Info -->
+                        <div class="space-y-4">
+                            <h3 class="text-lg font-semibold text-gray-700 border-b pb-2">Dados do Serviço</h3>
+                            
+                            <div class="relative">
+                                <label for="serviceType" class="block text-sm font-medium text-gray-700 mb-1">Tipo de Serviço*</label>
+                                <select id="serviceType" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none">
+                                    <option value="">Selecione...</option>
+                                    <option value="Revisão periódica">Revisão periódica</option>
+                                    <option value="Troca de óleo">Troca de óleo</option>
+                                    <option value="Alinhamento">Alinhamento</option>
+                                    <option value="Freios">Freios</option>
+                                    <option value="Elétrica">Elétrica</option>
+                                    <option value="Pintura">Pintura</option>
+                                    <option value="Outro">Outro</option>
+                                </select>
+                                <i class="fas fa-chevron-down absolute right-3 top-9 text-gray-400"></i>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="relative calendar-icon">
+                                    <label for="entryDate" class="block text-sm font-medium text-gray-700 mb-1">Data de Entrada*</label>
+                                    <input type="date" id="entryDate" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                </div>
+                                
+                                <div class="relative calendar-icon">
+                                    <label for="serviceDate" class="block text-sm font-medium text-gray-700 mb-1">Data do Serviço*</label>
+                                    <input type="date" id="serviceDate" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                </div>
+                                
+                                <div class="relative calendar-icon">
+                                    <label for="deliveryDate" class="block text-sm font-medium text-gray-700 mb-1">Data de Entrega*</label>
+                                    <input type="date" id="deliveryDate" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Staff Info -->
+                        <div class="space-y-4">
+                            <h3 class="text-lg font-semibold text-gray-700 border-b pb-2">Responsáveis</h3>
+                            
+                            <div class="relative">
+                                <label for="mechanic" class="block text-sm font-medium text-gray-700 mb-1">Mecânico*</label>
+                                <select id="mechanic" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none">
+                                    <option value="">Selecione...</option>
+                                    <option value="Marcos">Marcos</option>
+                                    <option value="Vinicius">Vinicius</option>
+                                    <option value="Wagner">Wagner</option>
+                                    <option value="Gilmar">Gilmar</option>
+                                    <option value="Jeferson">Jeferson</option>
+                                    <option value="Samuel">Samuel</option>
+                                </select>
+                                <i class="fas fa-chevron-down absolute right-3 top-9 text-gray-400"></i>
+                            </div>
+                            
+                            <div class="relative">
+                                <label for="seller" class="block text-sm font-medium text-gray-700 mb-1">Vendedor*</label>
+                                <select id="seller" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none">
+                                    <option value="">Selecione...</option>
+                                    <option value="Rikelme">Rikelme</option>
+                                    <option value="Jaelson">Jaelson</option>
+                                    <option value="Alessandra">Alessandra (estoque)</option>
+                                    <option value="Teste">Teste (Treinamento)</option>
+                                </select>
+                                <i class="fas fa-chevron-down absolute right-3 top-9 text-gray-400"></i>
+                            </div>
+                        </div>
+                        
+                        <!-- Notes -->
+                        <div class="space-y-4">
+                            <h3 class="text-lg font-semibold text-gray-700 border-b pb-2">Observações</h3>
+                            <div>
+                                <textarea id="notes" rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Detalhes adicionais sobre o serviço..."></textarea>
+                            </div>
+                        </div>
+                        
+                        <!-- Submit Button -->
+                        <div class="md:col-span-2 flex justify-end">
+                            <button type="submit" class="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition flex items-center">
+                                <i class="fas fa-calendar-check mr-2"></i> Agendar Serviço
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+            
+            <!-- View Appointments Section -->
+            <section id="viewSection" class="hidden fade-in">
+                <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                    <div class="p-6 border-b border-gray-200">
+                        <h2 class="text-2xl font-bold text-gray-800">Agendamentos</h2>
+                        <div class="mt-4 flex flex-col sm:flex-row sm:items-center justify-between">
+                            <div class="relative w-full sm:w-64 mb-4 sm:mb-0">
+                                <input type="text" id="searchInput" placeholder="Buscar agendamentos..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                            </div>
+                            <div class="flex space-x-2">
+                                <select id="filterMechanic" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="">Todos mecânicos</option>
+                                    <option value="Marcos">Marcos</option>
+                                    <option value="Vinicius">Vinicius</option>
+                                    <option value="Wagner">Wagner</option>
+                                    <option value="Gilmar">Gilmar</option>
+                                    <option value="Jeferson">Jeferson</option>
+                                    <option value="Samuel">Samuel</option>
+                                </select>
+                                <select id="filterStatus" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="">Todos status</option>
+                                    <option value="pending">Pendente</option>
+                                    <option value="in_progress">Em andamento</option>
+                                    <option value="completed">Concluído</option>
+                                    <option value="delivered">Entregue</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Moto</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Serviço</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mecânico</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data Serviço</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="appointmentsTable" class="bg-white divide-y divide-gray-200">
+                                <!-- Appointments will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div id="noAppointments" class="p-8 text-center hidden">
+                        <i class="fas fa-calendar-times text-4xl text-gray-300 mb-4"></i>
+                        <h3 class="text-lg font-medium text-gray-700">Nenhum agendamento encontrado</h3>
+                        <p class="text-gray-500 mt-1">Clique em "Novo Agendamento" para criar seu primeiro agendamento</p>
+                    </div>
+                    
+                    <div class="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+                        <div class="text-sm text-gray-500">
+                            Mostrando <span id="startItem" class="font-medium">0</span> a <span id="endItem" class="font-medium">0</span> de <span id="totalItems" class="font-medium">0</span> resultados
+                        </div>
+                        <div class="flex space-x-2">
+                            <button id="prevPage" class="px-3 py-1 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                Anterior
+                            </button>
+                            <button id="nextPage" class="px-3 py-1 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                Próxima
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <!-- Appointment Details Modal -->
+    <div id="appointmentModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+            
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg leading-6 font-medium text-gray-900" id="modalTitle">Detalhes do Agendamento</h3>
+                                <button id="closeModal" class="text-gray-400 hover:text-gray-500">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <h4 class="font-medium text-gray-700">Informações do Cliente</h4>
+                                    <div class="mt-2 space-y-2">
+                                        <p><span class="text-gray-500">Nome:</span> <span id="modalCustomerName" class="font-medium"></span></p>
+                                        <p><span class="text-gray-500">Telefone:</span> <span id="modalCustomerPhone" class="font-medium"></span></p>
+                                        <p><span class="text-gray-500">Moto:</span> <span id="modalBikeModel" class="font-medium"></span></p>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <h4 class="font-medium text-gray-700">Detalhes do Serviço</h4>
+                                    <div class="mt-2 space-y-2">
+                                        <p><span class="text-gray-500">Tipo:</span> <span id="modalServiceType" class="font-medium"></span></p>
+                                        <p><span class="text-gray-500">Mecânico:</span> <span id="modalMechanic" class="font-medium"></span></p>
+                                        <p><span class="text-gray-500">Vendedor:</span> <span id="modalSeller" class="font-medium"></span></p>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <h4 class="font-medium text-gray-700">Datas</h4>
+                                    <div class="mt-2 space-y-2">
+                                        <p><span class="text-gray-500">Entrada:</span> <span id="modalEntryDate" class="font-medium"></span></p>
+                                        <p><span class="text-gray-500">Serviço:</span> <span id="modalServiceDate" class="font-medium"></span></p>
+                                        <p><span class="text-gray-500">Entrega:</span> <span id="modalDeliveryDate" class="font-medium"></span></p>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <h4 class="font-medium text-gray-700">Status</h4>
+                                    <div class="mt-2">
+                                        <select id="modalStatus" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                            <option value="pending">Pendente</option>
+                                            <option value="in_progress">Em andamento</option>
+                                            <option value="completed">Concluído</option>
+                                            <option value="delivered">Entregue</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="md:col-span-2">
+                                    <h4 class="font-medium text-gray-700">Observações</h4>
+                                    <div class="mt-2">
+                                        <textarea id="modalNotes" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button id="saveChanges" type="button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        Salvar Alterações
+                    </button>
+                    <button id="deleteAppointment" type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-red-600 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        Excluir Agendamento
+                    </button>
+                    <button id="cancelModal" type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Success Notification -->
+    <div id="successNotification" class="fixed bottom-4 right-4 hidden">
+        <div class="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center">
+            <i class="fas fa-check-circle mr-2"></i>
+            <span id="successMessage">Operação realizada com sucesso!</span>
+        </div>
+    </div>
+    
+    <!-- Error Notification -->
+    <div id="errorNotification" class="fixed bottom-4 right-4 hidden">
+        <div class="bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center">
+            <i class="fas fa-exclamation-circle mr-2"></i>
+            <span id="errorMessage">Ocorreu um erro!</span>
+        </div>
+    </div>
+
+    <script>
+        // Local storage for appointments
+        let appointments = JSON.parse(localStorage.getItem('gilmarMotosAppointments')) || [];
+        let currentPage = 1;
+        const itemsPerPage = 10;
+        let currentAppointmentId = null;
+        
+        // DOM Elements
+        const scheduleSection = document.getElementById('scheduleSection');
+        const viewSection = document.getElementById('viewSection');
+        const scheduleTab = document.getElementById('scheduleTab');
+        const viewTab = document.getElementById('viewTab');
+        const scheduleForm = document.getElementById('scheduleForm');
+        const appointmentsTable = document.getElementById('appointmentsTable');
+        const noAppointments = document.getElementById('noAppointments');
+        const searchInput = document.getElementById('searchInput');
+        const filterMechanic = document.getElementById('filterMechanic');
+        const filterStatus = document.getElementById('filterStatus');
+        const prevPage = document.getElementById('prevPage');
+        const nextPage = document.getElementById('nextPage');
+        const startItem = document.getElementById('startItem');
+        const endItem = document.getElementById('endItem');
+        const totalItems = document.getElementById('totalItems');
+        const appointmentModal = document.getElementById('appointmentModal');
+        const closeModal = document.getElementById('closeModal');
+        const cancelModal = document.getElementById('cancelModal');
+        const saveChanges = document.getElementById('saveChanges');
+        const deleteAppointment = document.getElementById('deleteAppointment');
+        const successNotification = document.getElementById('successNotification');
+        const errorNotification = document.getElementById('errorNotification');
+        
+        // Tab switching
+        scheduleTab.addEventListener('click', () => {
+            scheduleSection.classList.remove('hidden');
+            viewSection.classList.add('hidden');
+            scheduleTab.classList.add('bg-blue-700', 'hover:bg-blue-600');
+            scheduleTab.classList.remove('hover:bg-blue-700');
+            viewTab.classList.remove('bg-blue-700', 'hover:bg-blue-600');
+            viewTab.classList.add('hover:bg-blue-700');
+        });
+        
+        viewTab.addEventListener('click', () => {
+            scheduleSection.classList.add('hidden');
+            viewSection.classList.remove('hidden');
+            viewTab.classList.add('bg-blue-700', 'hover:bg-blue-600');
+            viewTab.classList.remove('hover:bg-blue-700');
+            scheduleTab.classList.remove('bg-blue-700', 'hover:bg-blue-600');
+            scheduleTab.classList.add('hover:bg-blue-700');
+            renderAppointments();
+        });
+        
+        // Form submission
+        scheduleForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const customerName = document.getElementById('customerName').value;
+            const customerPhone = document.getElementById('customerPhone').value;
+            const bikeModel = document.getElementById('bikeModel').value;
+            const serviceType = document.getElementById('serviceType').value;
+            const entryDate = document.getElementById('entryDate').value;
+            const serviceDate = document.getElementById('serviceDate').value;
+            const deliveryDate = document.getElementById('deliveryDate').value;
+            const mechanic = document.getElementById('mechanic').value;
+            const seller = document.getElementById('seller').value;
+            const notes = document.getElementById('notes').value;
+            
+            const newAppointment = {
+                id: Date.now().toString(),
+                customerName,
+                customerPhone,
+                bikeModel,
+                serviceType,
+                entryDate,
+                serviceDate,
+                deliveryDate,
+                mechanic,
+                seller,
+                notes,
+                status: 'pending',
+                createdAt: new Date().toISOString()
+            };
+            
+            appointments.push(newAppointment);
+            saveAppointments();
+            
+            // Reset form
+            scheduleForm.reset();
+            
+            // Show success message
+            showNotification('Agendamento criado com sucesso!', true);
+            
+            // Switch to view tab
+            viewTab.click();
+        });
+        
+        // Render appointments
+        function renderAppointments() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const mechanicFilter = filterMechanic.value;
+            const statusFilter = filterStatus.value;
+            
+            let filteredAppointments = appointments.filter(appointment => {
+                const matchesSearch = 
+                    appointment.customerName.toLowerCase().includes(searchTerm) ||
+                    appointment.bikeModel.toLowerCase().includes(searchTerm) ||
+                    appointment.serviceType.toLowerCase().includes(searchTerm) ||
+                    appointment.mechanic.toLowerCase().includes(searchTerm);
+                
+                const matchesMechanic = mechanicFilter ? appointment.mechanic === mechanicFilter : true;
+                const matchesStatus = statusFilter ? appointment.status === statusFilter : true;
+                
+                return matchesSearch && matchesMechanic && matchesStatus;
+            });
+            
+            // Sort by service date (newest first)
+            filteredAppointments.sort((a, b) => new Date(b.serviceDate) - new Date(a.serviceDate));
+            
+            const totalItemsCount = filteredAppointments.length;
+            const totalPages = Math.ceil(totalItemsCount / itemsPerPage);
+            
+            // Update pagination info
+            startItem.textContent = ((currentPage - 1) * itemsPerPage) + 1;
+            endItem.textContent = Math.min(currentPage * itemsPerPage, totalItemsCount);
+            totalItems.textContent = totalItemsCount;
+            
+            // Enable/disable pagination buttons
+            prevPage.disabled = currentPage === 1;
+            nextPage.disabled = currentPage === totalPages || totalPages === 0;
+            
+            // Get current page items
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = Math.min(startIndex + itemsPerPage, totalItemsCount);
+            const currentItems = filteredAppointments.slice(startIndex, endIndex);
+            
+            // Clear table
+            appointmentsTable.innerHTML = '';
+            
+            if (currentItems.length === 0) {
+                noAppointments.classList.remove('hidden');
+            } else {
+                noAppointments.classList.add('hidden');
+                
+                currentItems.forEach(appointment => {
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-gray-50';
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div>
+                                    <div class="text-sm font-medium text-gray-900">${appointment.customerName}</div>
+                                    <div class="text-sm text-gray-500">${appointment.customerPhone}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">${appointment.bikeModel}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">${appointment.serviceType}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">${appointment.mechanic}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">${formatDate(appointment.serviceDate)}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClass(appointment.status)}">
+                                ${getStatusText(appointment.status)}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button class="text-blue-600 hover:text-blue-900 mr-3 view-btn" data-id="${appointment.id}">Ver</button>
+                            <button class="text-red-600 hover:text-red-900 delete-btn" data-id="${appointment.id}">Excluir</button>
+                        </td>
+                    `;
+                    
+                    appointmentsTable.appendChild(row);
+                });
+                
+                // Add event listeners to view buttons
+                document.querySelectorAll('.view-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = e.target.getAttribute('data-id');
+                        viewAppointment(id);
+                    });
+                });
+                
+                // Add event listeners to delete buttons
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = e.target.getAttribute('data-id');
+                        if (confirm('Tem certeza que deseja excluir este agendamento?')) {
+                            deleteAppointmentById(id);
+                        }
+                    });
+                });
+            }
+        }
+        
+        // View appointment details
+        function viewAppointment(id) {
+            const appointment = appointments.find(a => a.id === id);
+            if (!appointment) return;
+            
+            currentAppointmentId = id;
+            
+            // Fill modal with appointment data
+            document.getElementById('modalCustomerName').textContent = appointment.customerName;
+            document.getElementById('modalCustomerPhone').textContent = appointment.customerPhone;
+            document.getElementById('modalBikeModel').textContent = appointment.bikeModel;
+            document.getElementById('modalServiceType').textContent = appointment.serviceType;
+            document.getElementById('modalMechanic').textContent = appointment.mechanic;
+            document.getElementById('modalSeller').textContent = appointment.seller;
+            document.getElementById('modalEntryDate').textContent = formatDate(appointment.entryDate);
+            document.getElementById('modalServiceDate').textContent = formatDate(appointment.serviceDate);
+            document.getElementById('modalDeliveryDate').textContent = formatDate(appointment.deliveryDate);
+            document.getElementById('modalStatus').value = appointment.status;
+            document.getElementById('modalNotes').value = appointment.notes || '';
+            
+            // Show modal
+            appointmentModal.classList.remove('hidden');
+        }
+        
+        // Save changes to appointment
+        saveChanges.addEventListener('click', () => {
+            if (!currentAppointmentId) return;
+            
+            const appointment = appointments.find(a => a.id === currentAppointmentId);
+            if (!appointment) return;
+            
+            appointment.status = document.getElementById('modalStatus').value;
+            appointment.notes = document.getElementById('modalNotes').value;
+            
+            saveAppointments();
+            renderAppointments();
+            hideModal();
+            
+            showNotification('Alterações salvas com sucesso!', true);
+        });
+        
+        // Delete appointment
+        deleteAppointment.addEventListener('click', () => {
+            if (!currentAppointmentId) return;
+            
+            if (confirm('Tem certeza que deseja excluir este agendamento?')) {
+                deleteAppointmentById(currentAppointmentId);
+                hideModal();
+            }
+        });
+        
+        // Delete appointment by ID
+        function deleteAppointmentById(id) {
+            appointments = appointments.filter(a => a.id !== id);
+            saveAppointments();
+            renderAppointments();
+            
+            showNotification('Agendamento excluído com sucesso!', true);
+        }
+        
+        // Hide modal
+        function hideModal() {
+            appointmentModal.classList.add('hidden');
+            currentAppointmentId = null;
+        }
+        
+        // Close modal events
+        closeModal.addEventListener('click', hideModal);
+        cancelModal.addEventListener('click', hideModal);
+        
+        // Pagination
+        prevPage.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderAppointments();
+            }
+        });
+        
+        nextPage.addEventListener('click', () => {
+            const totalItemsCount = appointments.length;
+            const totalPages = Math.ceil(totalItemsCount / itemsPerPage);
+            
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderAppointments();
+            }
+        });
+        
+        // Search and filter events
+        searchInput.addEventListener('input', () => {
+            currentPage = 1;
+            renderAppointments();
+        });
+        
+        filterMechanic.addEventListener('change', () => {
+            currentPage = 1;
+            renderAppointments();
+        });
+        
+        filterStatus.addEventListener('change', () => {
+            currentPage = 1;
+            renderAppointments();
+        });
+        
+        // Save appointments to local storage
+        function saveAppointments() {
+            localStorage.setItem('gilmarMotosAppointments', JSON.stringify(appointments));
+        }
+        
+        // Format date for display
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            
+            const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+            return new Date(dateString).toLocaleDateString('pt-BR', options);
+        }
+        
+        // Get status text
+        function getStatusText(status) {
+            switch (status) {
+                case 'pending': return 'Pendente';
+                case 'in_progress': return 'Em andamento';
+                case 'completed': return 'Concluído';
+                case 'delivered': return 'Entregue';
+                default: return status;
+            }
+        }
+        
+        // Get status class for styling
+        function getStatusClass(status) {
+            switch (status) {
+                case 'pending': return 'bg-yellow-100 text-yellow-800';
+                case 'in_progress': return 'bg-blue-100 text-blue-800';
+                case 'completed': return 'bg-green-100 text-green-800';
+                case 'delivered': return 'bg-purple-100 text-purple-800';
+                default: return 'bg-gray-100 text-gray-800';
+            }
+        }
+        
+        // Show notification
+        function showNotification(message, isSuccess) {
+            if (isSuccess) {
+                document.getElementById('successMessage').textContent = message;
+                successNotification.classList.remove('hidden');
+                
+                setTimeout(() => {
+                    successNotification.classList.add('hidden');
+                }, 3000);
+            } else {
+                document.getElementById('errorMessage').textContent = message;
+                errorNotification.classList.remove('hidden');
+                
+                setTimeout(() => {
+                    errorNotification.classList.add('hidden');
+                }, 3000);
+            }
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set today's date as default for date inputs
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('entryDate').value = today;
+            document.getElementById('serviceDate').value = today;
+            
+            // Set min date for service and delivery dates
+            document.getElementById('serviceDate').min = today;
+            document.getElementById('deliveryDate').min = today;
+            
+            // Render initial appointments if on view tab
+            if (!viewSection.classList.contains('hidden')) {
+                renderAppointments();
+            }
+        });
+    </script>
+</body>
+</html>
